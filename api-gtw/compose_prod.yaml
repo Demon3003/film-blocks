@@ -1,0 +1,27 @@
+name:
+  base-app-project
+
+services:
+  base-app-prod:
+      image: base-app-img:prod
+      build:
+        context: .
+        target: prod
+      working_dir: /app
+      volumes:
+        - logs_prod_v:/app/logs
+      ports:
+        - "8086:8086"
+      environment:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_IP-127.0.0.1}:5432/art-registry
+        SPRING_DATASOURCE_USERNAME: dimazhuravlyov
+      secrets:
+        - db_pass
+      restart: always
+
+volumes:
+  logs_prod_v:
+
+secrets:
+  db_pass:
+    environment: "SPRING_DATASOURCE_PASSWORD"
