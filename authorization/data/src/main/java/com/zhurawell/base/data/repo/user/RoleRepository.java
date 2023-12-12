@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.math.BigInteger;
 import java.util.Optional;
 
-@Repository
+@Repository("userRoleRepository")
 public interface RoleRepository extends JpaRepository <Role, BigInteger> {
 
     @Query("from Role r left join fetch r.permissions where r.name = ?1")

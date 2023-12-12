@@ -11,12 +11,15 @@ public class JwtAuthenticationException extends AuthenticationException {
 
     private HttpStatus httpStatus;
 
+    private String errorCode;
+
     public JwtAuthenticationException(String msg) {
-        this(msg, HttpStatus.UNAUTHORIZED);
+        this(msg, HttpStatus.UNAUTHORIZED, "401");
     }
 
-    public JwtAuthenticationException(String msg, HttpStatus httpStatus) {
+    public JwtAuthenticationException(String msg, HttpStatus httpStatus, String errorCode) {
         super(msg);
+        this.errorCode = errorCode;
         this.httpStatus = httpStatus;
     }
 

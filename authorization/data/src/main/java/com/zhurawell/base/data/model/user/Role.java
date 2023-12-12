@@ -3,6 +3,7 @@ package com.zhurawell.base.data.model.user;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 import javax.persistence.*;
 import java.math.BigInteger;
@@ -15,6 +16,7 @@ import java.util.Set;
 @Getter
 @NoArgsConstructor
 @SequenceGenerator(name = "role_generator", sequenceName = "role_seq", allocationSize = 10, schema = "public")
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE, region = "main.role")
 public class Role {
 
     public Role(BigInteger id) {

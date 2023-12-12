@@ -7,6 +7,7 @@ import com.zhurawell.base.data.model.user.Permission;
 import com.zhurawell.base.data.repo.user.PermissionRepository;
 import com.zhurawell.base.data.repo.user.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +17,7 @@ import java.math.BigInteger;
 public class RoleServiceImpl implements RoleService {
 
     @Autowired
+    @Qualifier("userRoleRepository")
     private RoleRepository roleRepo;
 
     @Autowired

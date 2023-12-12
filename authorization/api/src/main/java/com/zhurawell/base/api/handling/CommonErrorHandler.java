@@ -16,10 +16,10 @@ public class CommonErrorHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
-    @ExceptionHandler(JwtAuthenticationException.class)
+    @ExceptionHandler(JwtAuthenticationException.class) // TODO add ErrorDto with error-code
     public ResponseEntity<String> handleAuthenticationError(JwtAuthenticationException ex) {
         log.error("Error occurred", ex);
-        return ResponseEntity.badRequest().body(ex.getMessage());
+        return ResponseEntity.status(ex.getHttpStatus()).body(ex.getMessage());
     }
 
 }

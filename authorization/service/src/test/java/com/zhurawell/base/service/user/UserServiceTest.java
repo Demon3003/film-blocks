@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import java.math.BigInteger;
 
@@ -27,11 +26,11 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-    @MockBean
-    EntityManager em;
-
-    @MockBean
-    EntityManagerFactory emf;
+//    @MockBean
+//    EntityManager em;
+//
+    @MockBean(name = "entityManagerFactory")
+    EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     public void setUpData() {

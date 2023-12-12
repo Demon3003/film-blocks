@@ -63,6 +63,7 @@ public class JwtTokenProvider {
 
     protected String createToken(String username, long validityInMinutes, String secret) {
         Claims claims = Jwts.claims().setSubject(username);
+        claims.put("test", "hhh");
         Date issuedAt = new Date();
         Date validity = Date.from(
                 LocalDateTime.now()
@@ -92,7 +93,7 @@ public class JwtTokenProvider {
         try {
             Jwts.parser().setSigningKey(singKey).parseClaimsJws(token);
         } catch (ExpiredJwtException expiredEx) {
-            throw new JwtAuthenticationException("JWT token is expired", HttpStatus.UNAUTHORIZED);
+            throw new JwtAuthenticationException("JWT token is expired", HttpStatus.UNAUTHORIZED, "1001"); // TODO remove raw String and ADD constant
         } catch (Exception ex) {
             throw new JwtAuthenticationException("JWT token is invalid: " + token, ex, HttpStatus.UNAUTHORIZED);
         }
