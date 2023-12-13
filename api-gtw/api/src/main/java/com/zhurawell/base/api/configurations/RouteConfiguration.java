@@ -50,12 +50,12 @@ public class RouteConfiguration {
             RouteLocatorBuilder builder,
             AuthenticationPrefilter authFilter) {
         return builder.routes()
-                .route("auth-service-route", r -> r.path("/authentication-service/**")
+                .route("auth-service-route", r -> r.path("/authorization-service/**")
                         .filters(f ->
-                                f.rewritePath("/authentication-service(?<segment>/?.*)", "$\\{segment}")
+                                f.rewritePath("/authorization-service(?<segment>/?.*)", "$\\{segment}")
                                         .filter(authFilter.apply(
                                                 new AuthenticationPrefilter.Config())))
-                        .uri("lb://authentication-service"))
+                        .uri("lb://authorization-service"))
                 .route("user-service-route", r -> r.path("/user-service/**")
                         .filters(f ->
                                 f.rewritePath("/user-service(?<segment>/?.*)", "$\\{segment}")

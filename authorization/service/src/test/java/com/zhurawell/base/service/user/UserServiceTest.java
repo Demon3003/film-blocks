@@ -26,9 +26,6 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-//    @MockBean
-//    EntityManager em;
-//
     @MockBean(name = "entityManagerFactory")
     EntityManagerFactory entityManagerFactory;
 

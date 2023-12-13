@@ -1,6 +1,5 @@
 package com.zhurawell.base.api.filters;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zhurawell.base.api.dto.grants.Authorities;
 import com.zhurawell.base.api.dto.jwt.JwtResponseDto;
@@ -21,7 +20,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -41,6 +39,9 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     @Value("${jwt.header}")
     private String AUTHORIZATION_HEADER;
 
+
+    public Predicate<ServerHttpRequest> isSecured = request -> excludedUrls.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
+
     @Autowired
     public AuthenticationPrefilter(WebClient.Builder webClientBuilder) {
         super(Config.class);
@@ -52,20 +53,19 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
-            log.info("**************************************************************************");
             log.info("URL is - " + request.getURI().getPath());
-            String bearerToken = request.getHeaders().getFirst(AUTHORIZATION_HEADER);
-            log.info("Bearer Token: "+ bearerToken);
+            String token = request.getHeaders().getFirst(AUTHORIZATION_HEADER);
+            log.info("Access token: "+ token);
 
             if(isSecured.test(request)) {
                 return webClientBuilder.build().get()
-                        .uri("lb://authentication-service/api/v1/validateToken")
-                        .header(AUTHORIZATION_HEADER, bearerToken)
+                        .uri("lb://authorization-service/api/validateToken")
+                        .header(AUTHORIZATION_HEADER, token)
                         .retrieve().bodyToMono(JwtResponseDto.class)
                         .map(response -> {
-                            exchange.getRequest().mutate().header("username", response.getLogin());
+                            exchange.getRequest().mutate().header("login", response.getLogin());
                             exchange.getRequest().mutate().header("authorities", response.getAuthorities().stream().map(Authorities::getAuthority).reduce("", (a, b) -> a + "," + b));
-                            exchange.getRequest().mutate().header("auth-token", response.getAccessToken());
+                            exchange.getRequest().mutate().header("accessToken", response.getAccessToken());
 
                             return exchange;
                         }).flatMap(chain::filter).onErrorResume(error -> {
@@ -90,22 +90,20 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
         };
     }
 
-    public Predicate<ServerHttpRequest> isSecured = request -> excludedUrls.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
     private Mono<Void> onError(ServerWebExchange exchange, String errCode, String err, String errDetails, HttpStatus httpStatus) {
         DataBufferFactory dataBufferFactory = exchange.getResponse().bufferFactory();
-//        ObjectMapper objMapper = new ObjectMapper();
         ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
-        try {
-            response.getHeaders().add("Content-Type", "application/json");
-            ExceptionResponseModel data = new ExceptionResponseModel(errCode, err, errDetails, null, new Date());
-            byte[] byteData = objectMapper.writeValueAsBytes(data);
-            return response.writeWith(Mono.just(byteData).map(t -> dataBufferFactory.wrap(t)));
-
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-
-        }
+//        try {
+//            response.getHeaders().add("Content-Type", "application/json");
+////            ExceptionResponseModel data = new ExceptionResponseModel(errCode, err, errDetails, null, new Date());
+//            byte[] byteData = objectMapper.writeValueAsBytes(data);
+//            return response.writeWith(Mono.just(byteData).map(t -> dataBufferFactory.wrap(t)));
+//
+//        } catch (JsonProcessingException e) {
+//            e.printStackTrace();
+//
+//        }
         return response.setComplete();
     }
 
