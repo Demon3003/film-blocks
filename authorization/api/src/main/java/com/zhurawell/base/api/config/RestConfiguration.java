@@ -1,6 +1,5 @@
 package com.zhurawell.base.api.config;
 
-import com.zhurawell.base.api.converters.GenericBigDecimalConverter;
 import com.zhurawell.base.api.converters.UserRestConverter;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
@@ -11,7 +10,6 @@ public class RestConfiguration implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
         registry.addConverter(new UserRestConverter());
-        registry.addConverter(new GenericBigDecimalConverter());
     }
 
 }

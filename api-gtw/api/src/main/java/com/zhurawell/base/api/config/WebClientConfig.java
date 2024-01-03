@@ -1,4 +1,4 @@
-package com.zhurawell.base.api.configurations;
+package com.zhurawell.base.api.config;
 
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;

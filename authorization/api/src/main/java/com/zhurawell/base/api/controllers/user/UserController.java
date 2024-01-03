@@ -2,6 +2,7 @@ package com.zhurawell.base.api.controllers.user;
 
 import com.zhurawell.base.api.dto.BaseDto;
 import com.zhurawell.base.api.dto.user.UserDto;
+import com.zhurawell.base.api.mappers.UserMapper;
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.repo.user.UserRepository;
 import com.zhurawell.base.api.converters.UserRestConverter;
@@ -27,40 +28,24 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
 
+    private UserMapper userMapper;
+
+
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        user.setRegistrationDate(new Date());
-        userRepository.save(user);
+    public ResponseEntity<UserDto> createUser(@RequestBody UserDto user) {
+
+        userService.saveUser(userMapper.dtoToEntity(user));
         log.debug("DMZH TEST: {}", user);
         return ResponseEntity.ok(user);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        userRepository.save(user);
+    public ResponseEntity<UserDto> updateUser(@RequestBody UserDto user) {
+        userService.saveUser(userMapper.dtoToEntity(user));
         log.debug("DMZH TEST: {}", user);
         return ResponseEntity.ok(user);
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable("id") BigInteger id) {
-        userRepository.deleteById(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/get/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("id") BigInteger id) {
-        return ResponseEntity.ok(new UserDto(userService.findById(id)));
-    }
-
-    @GetMapping("/getByFirstName")
-    public ResponseEntity<List<UserDto>> findAllByFirstName(@RequestParam("firstName") String name) {
-        return ResponseEntity.ok(BaseDto.fromPojoCollection(userService.findAllByFirstName(name),UserDto.class));
     }
 
     /**
@@ -70,13 +55,7 @@ public class UserController {
      * */
     @GetMapping("/get/new/")
     public ResponseEntity<User> getUserNew(User user) {
-        return ResponseEntity.ok(userRepository.findByLogin(user.getLogin()).get());
+        return ResponseEntity.ok(userService.findByLogin(user.getLogin()));
     }
 
-    @GetMapping("/getAllActiveFrom/{date}")
-    public ResponseEntity<List<User>> getUser(@PathVariable("date") Long activeFrom) {
-        log.debug("Active from date: {}", new Date(1644463162597L));
-
-        return ResponseEntity.ok(userRepository.findByRegistrationDateAfter(new Date(activeFrom)));
-    }
 }

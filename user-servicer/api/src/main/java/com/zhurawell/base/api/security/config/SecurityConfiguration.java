@@ -38,14 +38,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().and().cors().disable()
+                .csrf().disable()
+                .headers().frameOptions().disable()
+                .and()
                 .httpBasic().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // don't need with token
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll() // TODO add check for IP address
-                .antMatchers("/logout").permitAll()
-                .antMatchers("/refreshToken").permitAll()
+                .antMatchers("/login").permitAll() // TODO check config
                 .anyRequest()
                 .authenticated()
                 .and()

@@ -6,14 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.Hibernate;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.math.BigInteger;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Getter
@@ -31,27 +27,11 @@ public class User {
     @GeneratedValue(generator = "user_generator")
     private BigInteger id;
 
-    private String firstName;
-
-    private String lastName;
-
     private String login;
 
     private String password;
 
     private String email;
-
-    private String image;
-
-    private Date registrationDate;
-
-    private String token;
-
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     public User(BigInteger id) {
         this.id = id;
@@ -83,11 +63,8 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
                 ", login='" + login + '\'' +
                 ", email='" + email + '\'' +
-                ", registrationDate=" + registrationDate +
                 ", status=" + status +
                 '}';
     }

@@ -1,4 +1,4 @@
-package com.zhurawell.base.data.repo.impl;
+package com.zhurawell.base.data.repo.post.impl;
 
 import com.zhurawell.base.data.model.post.PostDetails;
 import com.zhurawell.base.data.repo.post.PostExtendedRepository;

@@ -12,15 +12,6 @@ public interface UserService {
 
     public User saveUser(User user);
 
-    public List<User> saveAllUsers(List<User> users);
+    public User findByLogin(String login);
 
-    public List<User> saveAllUsersBatched(List<User> users, int batchSize);
-
-    public void deleteAllUsersBatched(List<User> users);
-
-    public List<User> findAllByFirstName(String firstName);
-
-    public List<UserLightView> findByFirstNameLight(String firstName);
-
-    public User findByIdWithRole(BigInteger id);
 }

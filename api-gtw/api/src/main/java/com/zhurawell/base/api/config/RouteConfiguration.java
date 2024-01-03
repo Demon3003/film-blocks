@@ -1,4 +1,4 @@
-package com.zhurawell.base.api.configurations;
+package com.zhurawell.base.api.config;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;

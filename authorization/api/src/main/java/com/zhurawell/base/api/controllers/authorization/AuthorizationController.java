@@ -32,7 +32,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/login")     //TODO Add logout. Add token black list
-    public ResponseEntity login(@RequestBody UserLoginDto user) {
+    public ResponseEntity<JwtResponseDto> login(@RequestBody UserLoginDto user) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword()));
         Pair<String, String> tokens = jwtTokenProvider.createAccessAndRefreshTokens(user.getLogin());
         return ResponseEntity.ok(JwtResponseDto.builder()
@@ -43,7 +43,7 @@ public class AuthorizationController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity refreshToken(@RequestBody JwtTokenDto tokenDto) {
+    public ResponseEntity<JwtResponseDto> refreshToken(@RequestBody JwtTokenDto tokenDto) {
         jwtTokenProvider.validateRefreshToken(tokenDto.getToken());
         String login = jwtTokenProvider.getUsernameFromRefreshToken(tokenDto.getToken());
         Pair<String, String> tokens = jwtTokenProvider.createAccessAndRefreshTokens(login);
@@ -55,7 +55,7 @@ public class AuthorizationController {
     }
 
     @GetMapping("/validateToken")
-    public ResponseEntity validateToken(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<JwtResponseDto> validateToken(@RequestHeader("Authorization") String token) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         return ResponseEntity.ok(JwtResponseDto.builder()
                 .accessToken(token)

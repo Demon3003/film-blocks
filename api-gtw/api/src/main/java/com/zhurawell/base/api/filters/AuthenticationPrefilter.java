@@ -57,7 +57,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
             String token = request.getHeaders().getFirst(AUTHORIZATION_HEADER);
             log.info("Access token: "+ token);
 
-            if(isSecured.test(request)) {
+            if(isSecured.test(request)) { // TODO remove isSecured, instead use FilterRegistrationBean
                 return webClientBuilder.build().get()
                         .uri("lb://authorization-service/api/validateToken")
                         .header(AUTHORIZATION_HEADER, token)

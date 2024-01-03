@@ -60,7 +60,7 @@ public class UserController {
 
     @GetMapping("/getByFirstName")
     public ResponseEntity<List<UserDto>> findAllByFirstName(@RequestParam("firstName") String name) {
-        return ResponseEntity.ok(BaseDto.fromPojoCollection(userService.findAllByFirstName(name),UserDto.class));
+        return ResponseEntity.ok(BaseDto.fromPojoCollection(userService.findAllByFirstName(name), UserDto.class));
     }
 
     /**
