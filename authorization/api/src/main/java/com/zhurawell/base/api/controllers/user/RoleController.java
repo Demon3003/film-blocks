@@ -6,6 +6,8 @@ import com.zhurawell.base.service.user.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import java.math.BigInteger;
 
@@ -16,35 +18,47 @@ public class RoleController {
     @Autowired
     RoleService roleService;
 
+    @Autowired
     private RoleMapper roleMapper;
 
+    @Autowired
+    private Scheduler jdbcScheduler;
+
     @PostMapping("/create")
-    public ResponseEntity createRole(@RequestBody RoleDto role) {
-        roleService.createRole(roleMapper.dtoToEntity(role));
-        return ResponseEntity.ok().build();
+    public Mono<Void> createRole(@RequestBody RoleDto role) {
+       return Mono.fromRunnable(() ->
+                roleService.createRole(roleMapper.dtoToEntity(role)))
+                .subscribeOn(jdbcScheduler).then();
     }
 
     @PutMapping("/update")
-    public ResponseEntity updateRole(@RequestBody RoleDto role) {
-        roleService.updateRole(roleMapper.dtoToEntity(role));
-        return ResponseEntity.ok().build();
+    public Mono<Void> updateRole(@RequestBody RoleDto role) {
+        return Mono.fromRunnable(() ->
+                roleService.updateRole(roleMapper.dtoToEntity(role)))
+                .subscribeOn(jdbcScheduler).then();
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity deleteRole(@PathVariable("id") BigInteger id) {
-        roleService.deleteRoleById(id);
-        return ResponseEntity.ok().build();
+    public Mono<Void> deleteRole(@PathVariable("id") BigInteger id) {
+        return Mono.fromRunnable(() ->
+                roleService.deleteRoleById(id))
+                .subscribeOn(jdbcScheduler).then();
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<RoleDto> getRoleById(@PathVariable("id") BigInteger id) {
-        return ResponseEntity.ok(roleMapper.entityToDto(roleService.getRoleById(id)));
+    public Mono<RoleDto> getRoleById(@PathVariable("id") BigInteger id) {
+        return Mono.fromCallable(() ->
+                roleService.getRoleById(id)).map(roleMapper::entityToDto)
+                .subscribeOn(jdbcScheduler);
+
     }
 
     @PostMapping("/addPermission/{roleId}/{permissionId}")
-    public ResponseEntity addPermission(@PathVariable("roleId") BigInteger roleId,
-                                        @PathVariable("permissionId") BigInteger permissionId) {
-        roleService.addPermission(roleId, permissionId);
-        return ResponseEntity.ok().build();
+    public Mono<Void> addPermission(@PathVariable("roleId") BigInteger roleId,
+                                    @PathVariable("permissionId") BigInteger permissionId) {
+        return Mono.fromRunnable(() ->
+                roleService.addPermission(roleId, permissionId))
+                .subscribeOn(jdbcScheduler).then();
+
     }
 }

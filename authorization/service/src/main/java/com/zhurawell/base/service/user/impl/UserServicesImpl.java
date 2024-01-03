@@ -31,5 +31,10 @@ public class UserServicesImpl implements UserService {
         return userRepository.findByLogin(login);
     }
 
+    @Transactional
+    public void deleteById(BigInteger id) {
+        userRepository.deleteById(id);
+    }
+
 
 }
