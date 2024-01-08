@@ -2,25 +2,24 @@ package com.zhurawell.base.service.user;
 
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.projection.user.UserLightView;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.util.Date;
 import java.util.List;
 
 public interface UserService {
 
-    public User findById(BigInteger id);
+    public Mono<User> findById(BigInteger id);
 
-    public User saveUser(User user);
+    public Mono<User> saveUser(User user);
 
-    public List<User> saveAllUsers(List<User> users);
+    public Flux<User> findAllByFirstName(String firstName);
 
-    public List<User> saveAllUsersBatched(List<User> users, int batchSize);
+    Mono<Void> deleteById(BigInteger id);
 
-    public void deleteAllUsersBatched(List<User> users);
+    Mono<User> findByLogin(String login);
 
-    public List<User> findAllByFirstName(String firstName);
-
-    public List<UserLightView> findByFirstNameLight(String firstName);
-
-    public User findByIdWithRole(BigInteger id);
+    Flux<User> findByRegistrationDateAfter(Date date);
 }

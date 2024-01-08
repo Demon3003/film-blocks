@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface UserExtendedRepository {
 
-    void updateUsersInBatch(List<User> users, int batchSize);
+    void updateUsersInBatch(List<User> users);
 }

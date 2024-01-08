@@ -19,7 +19,7 @@
         <dependency>
             <groupId>com.zhurawell.blocks</groupId>
             <artifactId>api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>

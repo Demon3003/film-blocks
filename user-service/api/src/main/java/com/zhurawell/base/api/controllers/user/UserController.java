@@ -1,20 +1,20 @@
 package com.zhurawell.base.api.controllers.user;
 
-import com.zhurawell.base.api.dto.BaseDto;
-import com.zhurawell.base.api.dto.user.UserDto;
-import com.zhurawell.base.data.model.user.User;
-import com.zhurawell.base.data.repo.user.UserRepository;
 import com.zhurawell.base.api.converters.UserRestConverter;
+import com.zhurawell.base.api.dto.user.UserDto;
+import com.zhurawell.base.api.mapper.UserMapper;
 import com.zhurawell.base.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
-import java.util.List;
 
 /**
  * REST controller to manage data about users.
@@ -27,56 +27,47 @@ import java.util.List;
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
     private UserService userService;
 
+    @Autowired
+    private UserMapper userMapper;
+
     @PostMapping("/create")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        user.setRegistrationDate(new Date());
-        userRepository.save(user);
-        log.debug("DMZH TEST: {}", user);
-        return ResponseEntity.ok(user);
+    public Mono<UserDto> createUser(@RequestBody UserDto user) {
+        user.setRegistrationDate(LocalDate.now());
+        return userService.saveUser(userMapper.dtoToEntity(user)).map(userMapper::entityToDto);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<User> updateUser(@RequestBody User user) {
-        userRepository.save(user);
-        log.debug("DMZH TEST: {}", user);
-        return ResponseEntity.ok(user);
+    public Mono<UserDto> updateUser(@RequestBody UserDto user) {
+        return userService.saveUser(userMapper.dtoToEntity(user)).map(userMapper::entityToDto);
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<User> deleteUser(@PathVariable("id") BigInteger id) {
-        userRepository.deleteById(id);
-        return ResponseEntity.ok().build();
+    public Mono<ResponseEntity> deleteUser(@PathVariable("id") BigInteger id) {
+        return userService.deleteById(id).map(__ -> ResponseEntity.ok().build());
     }
 
     @GetMapping("/get/{id}")
-    public ResponseEntity<UserDto> getUser(@PathVariable("id") BigInteger id) {
-        return ResponseEntity.ok(new UserDto(userService.findById(id)));
+    public Mono<UserDto> getUser(@PathVariable("id") BigInteger id) {
+        return userService.findById(id).map(userMapper::entityToDto);
     }
 
     @GetMapping("/getByFirstName")
-    public ResponseEntity<List<UserDto>> findAllByFirstName(@RequestParam("firstName") String name) {
-        return ResponseEntity.ok(BaseDto.fromPojoCollection(userService.findAllByFirstName(name), UserDto.class));
+    public Flux<UserDto> findAllByFirstName(@RequestParam("firstName") String name) {
+        return userService.findAllByFirstName(name).map(userMapper::entityToDto);
     }
 
     /**
-     * RSET endpoint to test functionality of the
      * @see  UserRestConverter
-     * example of a request: http://localhost:8086/api/user/get/new/?user=Dmytro
      * */
     @GetMapping("/get/new/")
-    public ResponseEntity<User> getUserNew(User user) {
-        return ResponseEntity.ok(userRepository.findByLogin(user.getLogin()).get());
+    public Mono<UserDto> getUserNew(UserDto user) {
+        return userService.findByLogin(user.getLogin()).map(userMapper::entityToDto);
     }
 
     @GetMapping("/getAllActiveFrom/{date}")
-    public ResponseEntity<List<User>> getUser(@PathVariable("date") Long activeFrom) {
-        log.debug("Active from date: {}", new Date(1644463162597L));
-
-        return ResponseEntity.ok(userRepository.findByRegistrationDateAfter(new Date(activeFrom)));
+    public Flux<UserDto> getUser(@PathVariable("date") Long activeFrom) {
+        return userService.findByRegistrationDateAfter(new Date(activeFrom)).map(userMapper::entityToDto);
     }
 }

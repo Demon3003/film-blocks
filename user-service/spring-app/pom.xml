@@ -15,6 +15,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <jjwt.version>0.9.1</jjwt.version>
+        <flyway.version>8.2.3</flyway.version>
     </properties>
 
     <dependencies>
@@ -22,6 +23,12 @@
             <groupId>com.zhurawell.blocks</groupId>
             <artifactId>api</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+            <scope>runtime</scope>
         </dependency>
     </dependencies>
 

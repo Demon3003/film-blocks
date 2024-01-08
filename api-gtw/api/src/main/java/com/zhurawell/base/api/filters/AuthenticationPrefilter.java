@@ -31,7 +31,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     @Qualifier("excludedUrls")
     private List<String> excludedUrls;
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -45,7 +45,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     @Autowired
     public AuthenticationPrefilter(WebClient.Builder webClientBuilder) {
         super(Config.class);
-        this.webClientBuilder=webClientBuilder;
+        this.webClient=webClientBuilder.build();
     }
 
 
@@ -58,7 +58,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
             log.info("Access token: "+ token);
 
             if(isSecured.test(request)) { // TODO remove isSecured, instead use FilterRegistrationBean
-                return webClientBuilder.build().get()
+                return webClient.get()
                         .uri("lb://authorization-service/api/validateToken")
                         .header(AUTHORIZATION_HEADER, token)
                         .retrieve().bodyToMono(JwtResponseDto.class)
@@ -68,7 +68,8 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
                             exchange.getRequest().mutate().header("accessToken", response.getAccessToken());
 
                             return exchange;
-                        }).flatMap(chain::filter).onErrorResume(error -> {
+                        }).flatMap(chain::filter)
+                        .onErrorResume(error -> {
                             log.info("Error Happened");
                             HttpStatus errorCode = null;
                             String errorMsg = "";

@@ -8,8 +8,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import reactor.core.publisher.Mono;
 
-import javax.persistence.EntityManagerFactory;
 import java.math.BigInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,20 +27,17 @@ public class UserServiceTest {
     @MockBean
     private UserRepository userRepository;
 
-//    @MockBean
-//    EntityManager em;
-//
-    @MockBean(name = "entityManagerFactory")
-    EntityManagerFactory entityManagerFactory;
+    @MockBean
+    R2dbcEntityTemplate et;
 
     @BeforeEach
     public void setUpData() {
-        when(userRepository.save(any(User.class))).thenReturn(new User(BigInteger.ONE));
+        when(userRepository.save(any(User.class))).thenReturn(Mono.just(new User(BigInteger.ONE)));
     }
 
     @Test
     public void test_save() {
-        assertThat(userServices.saveUser(new User(BigInteger.ONE))).isEqualTo(new User(BigInteger.ONE));
+        assertThat(userServices.saveUser(new User(BigInteger.ONE)).block()).isEqualTo(new User(BigInteger.ONE));
     }
 
 }
