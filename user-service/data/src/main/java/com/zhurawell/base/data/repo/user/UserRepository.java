@@ -17,6 +17,7 @@ public interface UserRepository extends R2dbcRepository<User, BigInteger>, UserE
     Flux<User> findByRegistrationDateAfter(Date afterDate);
 
     Mono<User> findByLogin(String login);
+
     Flux<User> findByFirstnameContaining(String firstName);
 
 }
