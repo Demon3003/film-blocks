@@ -28,7 +28,7 @@ public class UserServicesImpl implements UserService {
     }
 
     public Flux<User> findAllByFirstName(String firstName) {
-        return userRepository.findByFirstnameContaining(firstName);
+        return userRepository.findByFirstNameContaining(firstName);
     }
 
     @Override

@@ -8,14 +8,14 @@ import reactor.core.scheduler.Scheduler;
 import reactor.core.scheduler.Schedulers;
 
 @Configuration
-public class JdbcScheduler {
+public class JdbcSchedulerConfig {
 
 
     private final Integer threadPoolSize;
     private final Integer taskQueueSize;
 
     @Autowired
-    public JdbcScheduler(
+    public JdbcSchedulerConfig(
             @Value("${app.threadPoolSize}") Integer threadPoolSize,
             @Value("${app.taskQueueSize}") Integer taskQueueSize
     ) {

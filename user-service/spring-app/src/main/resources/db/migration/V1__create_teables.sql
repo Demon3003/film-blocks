@@ -13,10 +13,3 @@ CREATE TABLE public.users
     CONSTRAINT user_pkey PRIMARY KEY (id)
 )
 TABLESPACE pg_default;
-
-CREATE SEQUENCE public.user_seq
-    INCREMENT 50
-    START 1
-    MINVALUE 1
-    MAXVALUE 9223372036854775807
-    CACHE 1;

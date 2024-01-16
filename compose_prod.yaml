@@ -1,27 +1,92 @@
 name:
-  base-app-project
+  blocks
+
+x-common-env: &common-env
+    SPRING_PROFILES_ACTIVE: prod
+    EUREKA_USER: ${EUREKA_USER-eurekauser}
+    EUREKA_PASS: ${EUREKA_PASS-eureka}
+    EUREKA_HOST: ${EUREKA_HOST-192.168.0.103}
+
+x-rabbit-env: &rabbit-env
+  RABBIT_HOST: ${RABBIT_HOST-192.168.0.103}
+  RABBIT_PORT: ${RABBIT_PORT-5672}
+  RABBIT_USERNAME: ${RABBIT_USERNAME-guest}
+  RABBIT_PASS: ${RABBIT_PASS-guest}
+
 
 services:
-  base-app-prod:
-      image: base-app-img:prod
+  api-gtw:
       build:
-        context: .
+        context: api-gtw
         target: prod
-      working_dir: /app
-      volumes:
-        - logs_prod_v:/app/logs
       ports:
-        - "8086:8086"
+        - "8765:8765"
       environment:
-        SPRING_DATASOURCE_URL: jdbc:postgresql://${DB_IP-127.0.0.1}:5432/art-registry
-        SPRING_DATASOURCE_USERNAME: dimazhuravlyov
-      secrets:
-        - db_pass
+        <<: [*common-env, *rabbit-env]
       restart: always
+      depends_on:
+        rabbitmq:
+          condition: service_healthy
+
+  authorization:
+    build:
+      context: authorization
+      target: prod
+    ports:
+      - "8555:8555"
+    environment:
+      <<: *common-env
+      SECRET_ACCESS_TOKEN: ${AUTH_SECRET_ACCESS_TOKEN-secret}
+      SECRET_REFRESH_TOKEN: ${AUTH_SECRET_REFRESH_TOKEN-secret}
+      SPRING_DATASOURCE_URL: ${AUTH_SPRING_DATASOURCE_URL-jdbc:postgresql://192.168.0.103:5432/blocks_authorization}
+      SPRING_DATASOURCE_USERNAME: ${AUTH_SPRING_DATASOURCE_USERNAME-dmytro_authorization_service}
+      SPRING_DATASOURCE_PASSWORD: ${AUTH_SPRING_DATASOURCE_PASSWORD-1111}
+    restart:
+      always
+
+  discovery-service:
+    build:
+      context: discovery-service
+      target: prod
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_HOST_NAME: ${EUREKA_HOST_NAME-192.168.0.103}
+      EUREKA_SECURITY_USER: ${EUREKA_SECURITY_USER-eurekauser}
+      EUREKA_SECURITY_PASS: ${EUREKA_SECURITY_PASS-eureka}
+    restart:
+      always
+
+  user-service:
+    build:
+      context: user-service
+      target: prod
+    ports:
+      - "8556:8556"
+    environment:
+      <<: [*common-env, *rabbit-env]
+      SPRING_DATASOURCE_URL: ${USER_SPRING_DATASOURCE_URL-r2dbc:pool:postgres://192.168.0.103:5432/blocks_user}
+      SPRING_DATASOURCE_FLYWAY_URL: ${SPRING_DATASOURCE_FLYWAY_URL:jdbc:postgresql://192.168.0.103:5432/blocks_user}
+      SPRING_DATASOURCE_USERNAME: ${USER_SPRING_DATASOURCE_USERNAME-dmytro_user_service}
+      SPRING_DATASOURCE_PASSWORD: ${USER_SPRING_DATASOURCE_PASSWORD-1111}
+    restart:
+      always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  rabbitmq:
+    image: rabbitmq:3.11.8-management
+    mem_limit: 512m
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+
 
 volumes:
   logs_prod_v:
-
-secrets:
-  db_pass:
-    environment: "SPRING_DATASOURCE_PASSWORD"

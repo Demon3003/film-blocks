@@ -18,6 +18,6 @@ public interface UserRepository extends R2dbcRepository<User, BigInteger>, UserE
 
     Mono<User> findByLogin(String login);
 
-    Flux<User> findByFirstnameContaining(String firstName);
+    Flux<User> findByFirstNameContaining(String firstName);
 
 }

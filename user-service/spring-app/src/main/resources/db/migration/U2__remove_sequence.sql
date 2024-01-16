@@ -1,1 +1,0 @@
-drop sequence user_seq;
