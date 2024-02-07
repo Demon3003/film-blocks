@@ -5,6 +5,7 @@ import com.zhurawell.base.api.mappers.RoleMapper;
 import com.zhurawell.base.service.user.RoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -32,6 +33,7 @@ public class RoleController {
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasAuthority('sysadm')")
     public Mono<Void> updateRole(@RequestBody RoleDto role) {
         return Mono.fromRunnable(() ->
                 roleService.updateRole(roleMapper.dtoToEntity(role)))
@@ -39,6 +41,7 @@ public class RoleController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasAuthority('sysadm')")
     public Mono<Void> deleteRole(@PathVariable("id") BigInteger id) {
         return Mono.fromRunnable(() ->
                 roleService.deleteRoleById(id))
@@ -54,6 +57,7 @@ public class RoleController {
     }
 
     @PostMapping("/addPermission/{roleId}/{permissionId}")
+    @PreAuthorize("hasAuthority('sysadm')")
     public Mono<Void> addPermission(@PathVariable("roleId") BigInteger roleId,
                                     @PathVariable("permissionId") BigInteger permissionId) {
         return Mono.fromRunnable(() ->

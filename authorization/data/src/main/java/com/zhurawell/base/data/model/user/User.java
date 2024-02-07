@@ -20,7 +20,6 @@ import java.math.BigInteger;
 @NamedEntityGraph(name = "g-user-role", attributeNodes =
     @NamedAttributeNode(value = "role", subgraph = "sub-role-permission"),
     subgraphs = @NamedSubgraph(name = "sub-role-permission", attributeNodes = @NamedAttributeNode(value = "permissions")))
-@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "main.user")
 public class User {
 
     @Id

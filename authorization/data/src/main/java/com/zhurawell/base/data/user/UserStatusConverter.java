@@ -10,7 +10,7 @@ public class UserStatusConverter implements AttributeConverter<Status, Integer> 
 
 
     public Integer convertToDatabaseColumn(Status status) {
-        return status.getId();
+        return status == null ? null : status.getId();
     }
 
     public Status convertToEntityAttribute(Integer statusId) {

@@ -6,6 +6,7 @@ import com.zhurawell.base.api.dto.user.UserLoginDto;
 import com.zhurawell.base.api.security.jwt.JwtTokenProvider;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -49,6 +50,13 @@ public class AuthorizationController {
                 .build())
             .subscribeOn(jdbcScheduler);
     }
+
+    @PostMapping("/user/logout")
+    public ResponseEntity logout() {
+        SecurityContextHolder.clearContext();
+        return ResponseEntity.ok().build();
+    }
+
 
     @PostMapping("/refreshToken")
     public Mono<JwtResponseDto> refreshToken(@RequestBody JwtTokenDto tokenDto) {

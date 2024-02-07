@@ -16,8 +16,8 @@ public class JdbcSchedulerConfig {
 
     @Autowired
     public JdbcSchedulerConfig(
-            @Value("${app.threadPoolSize}") Integer threadPoolSize,
-            @Value("${app.taskQueueSize}") Integer taskQueueSize
+            @Value("${jdbc.scheduler.threadPoolSize}") Integer threadPoolSize,
+            @Value("${jdbc.scheduler.taskQueueSize}") Integer taskQueueSize
     ) {
         this.threadPoolSize = threadPoolSize;
         this.taskQueueSize = taskQueueSize;

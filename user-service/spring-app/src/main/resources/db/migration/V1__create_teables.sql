@@ -7,7 +7,7 @@ CREATE TABLE public.users
     email character varying(40) COLLATE pg_catalog."default",
     image character varying(200) COLLATE pg_catalog."default",
     registration_date date DEFAULT now(),
-    status_id integer NOT NULL,
+    status_id integer DEFAULT 2,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     CONSTRAINT user_pkey PRIMARY KEY (id)

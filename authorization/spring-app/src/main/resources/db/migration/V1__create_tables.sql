@@ -32,7 +32,7 @@ CREATE TABLE users
 (
     id bigint NOT NULL,
     login character varying(20) NOT NULL,
-    password character varying(30) NOT NULL,
+    password character varying(200) NOT NULL,
     email character varying(40),
     status_id integer NOT NULL,
     role_id bigint NOT NULL,
