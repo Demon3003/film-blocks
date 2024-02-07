@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 
 import java.math.BigInteger;
 
@@ -17,9 +19,12 @@ public class UserServicesImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private Scheduler jdbcScheduler;
+
     @Transactional
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public Mono<User> saveUserDetails(User user) {
+        return Mono.fromCallable(() -> userRepository.save(user)) .subscribeOn(jdbcScheduler);
     }
 
 
@@ -29,6 +34,11 @@ public class UserServicesImpl implements UserService {
 
     public User findByLogin(String login) {
         return userRepository.findByLogin(login);
+    }
+
+    @Transactional
+    public void deleteById(BigInteger id) {
+        userRepository.deleteById(id);
     }
 
 

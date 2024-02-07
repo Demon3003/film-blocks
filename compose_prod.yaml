@@ -1,0 +1,148 @@
+name:
+  blocks-prod
+
+x-common-env: &common-env
+    SPRING_PROFILES_ACTIVE: prod
+    EUREKA_USER: ${EUREKA_USER}
+    EUREKA_PASS: ${EUREKA_PASS}
+    EUREKA_HOST: ${EUREKA_HOST}
+
+x-rabbit-env: &rabbit-env
+  RABBIT_HOST: ${RABBIT_HOST}
+  RABBIT_PORT: ${RABBIT_PORT}
+  RABBIT_USERNAME: ${RABBIT_USERNAME}
+  RABBIT_PASS: ${RABBIT_PASS}
+
+
+services:
+  api-gtw:
+      build:
+        context: api-gtw
+        target: prod
+      ports:
+        - "8765:8765"
+      networks:
+        - blocks_app_net
+      environment:
+        <<: [*common-env, *rabbit-env]
+      restart: always
+      depends_on:
+        rabbitmq:
+          condition: service_healthy
+
+  authorization:
+    build:
+      context: authorization
+      target: prod
+    ports:
+      - "8555:8555"
+    networks:
+      - blocks_app_net
+    environment:
+      <<: *common-env
+      SECRET_ACCESS_TOKEN: ${AUTH_SECRET_ACCESS_TOKEN}
+      SECRET_REFRESH_TOKEN: ${AUTH_SECRET_REFRESH_TOKEN}
+      SPRING_DATASOURCE_URL: ${AUTH_POSTGRES_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${AUTH_POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+    restart:
+      always
+    depends_on:
+      authorization-db:
+        condition: service_healthy
+
+  authorization-db:
+    image: postgres:15.5-alpine3.19
+    environment:
+      POSTGRES_HOST: authorization-db
+      POSTGRES_USER: ${AUTH_POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${AUTH_POSTGRES_PASSWORD}
+      POSTGRES_DB: blocks_authorization
+    ports:
+      - "5432:5432"
+    networks:
+      - blocks_app_net
+    volumes:
+      -  authorization-db_v:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U dmytro_authorization_service -d blocks_authorization'" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+
+  discovery-service:
+    build:
+      context: discovery-service
+      target: prod
+    ports:
+      - "8761:8761"
+    networks:
+      - blocks_app_net
+    environment:
+      EUREKA_HOST_NAME: ${EUREKA_HOST}
+      EUREKA_SECURITY_USER: ${EUREKA_USER}
+      EUREKA_SECURITY_PASS: ${EUREKA_PASS}
+    restart:
+      always
+
+  user-service:
+    build:
+      context: user-service
+      target: prod
+    ports:
+      - "8556:8556"
+    networks:
+      - blocks_app_net
+    environment:
+      <<: [*common-env, *rabbit-env]
+      SPRING_DATASOURCE_URL: ${USER_SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_FLYWAY_URL: ${USER_DATASOURCE_FLYWAY_URL}
+      SPRING_DATASOURCE_USERNAME: ${USER_POSTGRES_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${USER_POSTGRES_PASSWORD}
+    restart:
+      always
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      user-db:
+        condition: service_healthy
+
+  user-db:
+    image: postgres:15.5-alpine3.19
+    environment:
+      POSTGRES_HOST: user-db
+      POSTGRES_USER: ${USER_POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${USER_POSTGRES_PASSWORD}
+      POSTGRES_DB: blocks_user
+    ports:
+      - "5433:5432"
+    networks:
+      - blocks_app_net
+    volumes:
+      - user-db_v:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U dmytro_user_service -d blocks_user'" ]
+      interval: 5s
+      timeout: 30s
+      retries: 3
+
+  rabbitmq:
+    image: rabbitmq:3.11.8-management
+    mem_limit: 512m
+    networks:
+      - blocks_app_net
+    ports:
+      - 5672:5672
+      - 15672:15672
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 5s
+      timeout: 3s
+      retries: 60
+
+networks:
+  blocks_app_net:
+
+volumes:
+  authorization-db_v:
+  user-db_v:

@@ -1,8 +1,12 @@
 package com.zhurawell.base.api.filters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zhurawell.base.api.constants.RestHeaders;
+import com.zhurawell.base.api.constants.ServiceUrl;
 import com.zhurawell.base.api.dto.grants.Authorities;
 import com.zhurawell.base.api.dto.jwt.JwtResponseDto;
+import com.zhurawell.base.api.dto.user.UserDto;
+import com.zhurawell.base.api.intregration.broker.client.UserBrokerClient;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +24,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -31,7 +36,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     @Qualifier("excludedUrls")
     private List<String> excludedUrls;
 
-    private final WebClient.Builder webClientBuilder;
+    private final WebClient webClient;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -39,13 +44,16 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
     @Value("${jwt.header}")
     private String AUTHORIZATION_HEADER;
 
+    @Autowired
+    private UserBrokerClient userBrokerClient;
+
 
     public Predicate<ServerHttpRequest> isSecured = request -> excludedUrls.stream().noneMatch(uri -> request.getURI().getPath().contains(uri));
 
     @Autowired
     public AuthenticationPrefilter(WebClient.Builder webClientBuilder) {
         super(Config.class);
-        this.webClientBuilder=webClientBuilder;
+        this.webClient=webClientBuilder.build();
     }
 
 
@@ -56,20 +64,29 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
             log.info("URL is - " + request.getURI().getPath());
             String token = request.getHeaders().getFirst(AUTHORIZATION_HEADER);
             log.info("Access token: "+ token);
-
+            //TEST
+            if(request.getURI().getPath().contains("createUser")) {
+                UserDto user = new UserDto();
+                user.setEmail("dhjcbjhdc@dsd.com");
+                user.setFirstName("Test");
+                user.setLastName("Tester");
+                user.setRegistrationDate(LocalDate.now());
+                userBrokerClient.createUser(user);
+                return chain.filter(exchange);
+            }
+            //TEST
             if(isSecured.test(request)) { // TODO remove isSecured, instead use FilterRegistrationBean
-                return webClientBuilder.build().get()
-                        .uri("lb://authorization-service/api/validateToken")
+                return webClient.get()
+                        .uri(ServiceUrl.VALIDATE_TOKEN)
                         .header(AUTHORIZATION_HEADER, token)
                         .retrieve().bodyToMono(JwtResponseDto.class)
                         .map(response -> {
-                            exchange.getRequest().mutate().header("login", response.getLogin());
-                            exchange.getRequest().mutate().header("authorities", response.getAuthorities().stream().map(Authorities::getAuthority).reduce("", (a, b) -> a + "," + b));
-                            exchange.getRequest().mutate().header("accessToken", response.getAccessToken());
-
+                            exchange.getRequest().mutate().header(RestHeaders.LOGIN_HEADER, response.getLogin());
+                            exchange.getRequest().mutate().header(RestHeaders.AUTHORITY_HEADER, response.getAuthorities().stream().map(Authorities::getAuthority).reduce("", (a, b) -> a + "," + b));
                             return exchange;
-                        }).flatMap(chain::filter).onErrorResume(error -> {
-                            log.info("Error Happened");
+                        }).flatMap(chain::filter)
+                        .onErrorResume(error -> {
+                            log.info("Error Happened:", error);
                             HttpStatus errorCode = null;
                             String errorMsg = "";
                             if (error instanceof WebClientResponseException) {

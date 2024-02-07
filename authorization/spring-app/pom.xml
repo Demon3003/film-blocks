@@ -12,8 +12,6 @@
     <artifactId>spring-app</artifactId>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
         <jjwt.version>0.9.1</jjwt.version>
     </properties>
 
@@ -21,7 +19,7 @@
         <dependency>
             <groupId>com.zhurawell.blocks</groupId>
             <artifactId>api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
@@ -46,7 +44,7 @@
                 </configuration>
             </plugin>
         </plugins>
-        <finalName>authorization</finalName>
+        <finalName>authorization-service</finalName>
     </build>
 
 </project>
