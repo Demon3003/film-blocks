@@ -1,5 +1,6 @@
 package com.zhurawell.base.service.user.impl;
 
+import com.zhurawell.base.data.model.user.Status;
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.repo.user.UserRepository;
 import com.zhurawell.base.service.user.UserService;
@@ -19,12 +20,17 @@ public class UserServicesImpl implements UserService {
     @Autowired
     UserRepository userRepository;
 
-    @Autowired
-    private Scheduler jdbcScheduler;
-
+    @Override
     @Transactional
-    public Mono<User> saveUserDetails(User user) {
-        return Mono.fromCallable(() -> userRepository.save(user)) .subscribeOn(jdbcScheduler);
+    public User registerNewUser(User user) {
+        user.setStatus(Status.NEW);
+        return saveUserDetails(user);
+    }
+
+    @Override
+    @Transactional
+    public User saveUserDetails(User user) {
+        return userRepository.save(user);
     }
 
 

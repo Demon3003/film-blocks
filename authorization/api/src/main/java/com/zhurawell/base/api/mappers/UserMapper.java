@@ -2,6 +2,7 @@ package com.zhurawell.base.api.mappers;
 
 
 import com.zhurawell.base.api.dto.user.UserDto;
+import com.zhurawell.base.api.integration.requests.user.CreateBaseUserRequest;
 import com.zhurawell.base.data.model.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -25,4 +26,6 @@ public abstract class UserMapper {
     public abstract List<UserDto> entityListToApiList(List<User> entity);
 
     public abstract List<User> apiListToEntityList(List<UserDto> api);
+
+    public abstract CreateBaseUserRequest dtoToCreateRequest(UserDto user);
 }

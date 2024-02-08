@@ -43,8 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // don't need with token
                 .and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/logout").permitAll()
+                .antMatchers("/login", "/register").permitAll()
                 .antMatchers("/refreshToken").permitAll()
                 .anyRequest()
                 .authenticated()

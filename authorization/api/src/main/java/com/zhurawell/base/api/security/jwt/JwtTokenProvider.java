@@ -1,6 +1,7 @@
 package com.zhurawell.base.api.security.jwt;
 
-import com.zhurawell.base.api.security.exceptions.JwtAuthenticationException;
+import com.zhurawell.blocks.common.utils.exception.CustomExceptionHandler;
+import com.zhurawell.blocks.common.utils.exception.ErrorCodes;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -10,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -93,9 +93,9 @@ public class JwtTokenProvider {
         try {
             Jwts.parser().setSigningKey(singKey).parseClaimsJws(token);
         } catch (ExpiredJwtException expiredEx) {
-            throw new JwtAuthenticationException("JWT token is expired", HttpStatus.UNAUTHORIZED, "1001"); // TODO remove raw String and ADD constant
+            CustomExceptionHandler.getInstance().withErrorCode(ErrorCodes.C_301).buildAndThrow();
         } catch (Exception ex) {
-            throw new JwtAuthenticationException("JWT token is invalid: " + token, ex, HttpStatus.UNAUTHORIZED);
+            CustomExceptionHandler.getInstance().withErrorCode(ErrorCodes.C_302).buildAndThrow();
         }
         return token;
     }

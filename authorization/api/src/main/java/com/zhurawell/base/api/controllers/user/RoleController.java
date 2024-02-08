@@ -33,7 +33,6 @@ public class RoleController {
     }
 
     @PutMapping("/update")
-    @PreAuthorize("hasAuthority('sysadm')")
     public Mono<Void> updateRole(@RequestBody RoleDto role) {
         return Mono.fromRunnable(() ->
                 roleService.updateRole(roleMapper.dtoToEntity(role)))

@@ -1,5 +1,6 @@
 package com.zhurawell.base.service.user.impl;
 
+import com.zhurawell.base.data.model.user.Status;
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.repo.user.UserRepository;
 import com.zhurawell.base.service.user.UserService;
@@ -11,6 +12,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Service
@@ -23,6 +25,14 @@ public class UserServicesImpl implements UserService {
     @Autowired
     R2dbcEntityTemplate entityTemplate;
 
+    @Override
+    public Mono<User> createNewUser(User user) {
+        user.setRegistrationDate(LocalDate.now());
+        user.setStatus(Status.NEW.getId());
+        return saveUser(user);
+    }
+
+    @Override
     public Mono<User> saveUser(User user) {
         return userRepository.save(user);
     }
