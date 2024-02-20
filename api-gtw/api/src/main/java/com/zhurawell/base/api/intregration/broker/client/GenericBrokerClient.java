@@ -1,6 +1,6 @@
 package com.zhurawell.base.api.intregration.broker.client;
 
-import com.zhurawell.base.api.intregration.broker.model.Event;
+import com.zhurawell.blocks.common.broker.model.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;

@@ -1,7 +1,8 @@
-package com.zhurawell.base.api.intregration.broker.model;
+package com.zhurawell.blocks.common.broker.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
+
 import java.time.ZonedDateTime;
 
 import static java.time.ZonedDateTime.now;

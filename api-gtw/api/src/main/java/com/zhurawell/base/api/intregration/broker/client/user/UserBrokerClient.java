@@ -1,7 +1,8 @@
-package com.zhurawell.base.api.intregration.broker.client;
+package com.zhurawell.base.api.intregration.broker.client.user;
 
 import com.zhurawell.base.api.dto.user.UserDto;
-import com.zhurawell.base.api.intregration.broker.model.Event;
+import com.zhurawell.base.api.intregration.broker.client.GenericBrokerClient;
+import com.zhurawell.blocks.common.broker.model.Event;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,7 @@ public class UserBrokerClient extends GenericBrokerClient {
 
     public Mono<UserDto> createUser(UserDto user) {
         return Mono.fromCallable(() -> {
-            sendMessage("products-out-0", new Event(Event.Type.CREATE, user.getLogin(), user));
+            sendMessage("users-out-0", new Event(Event.Type.CREATE, user.getLogin(), user));
             return user;
         }).subscribeOn(publishEventScheduler);
     }

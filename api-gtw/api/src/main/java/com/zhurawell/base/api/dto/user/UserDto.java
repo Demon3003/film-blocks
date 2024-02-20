@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigInteger;
 import java.time.LocalDate;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -27,7 +28,7 @@ public class UserDto  {
 
     private String image;
 
-    private LocalDate registrationDate;
+    private Date registrationDate;
 
     private Integer status;
 
