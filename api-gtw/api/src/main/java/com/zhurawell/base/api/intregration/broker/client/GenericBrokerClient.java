@@ -2,6 +2,7 @@ package com.zhurawell.base.api.intregration.broker.client;
 
 import com.zhurawell.blocks.common.broker.model.Event;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.stream.binding.StreamListenerMessageHandler;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
@@ -20,7 +21,12 @@ public abstract class GenericBrokerClient {
         Message message = MessageBuilder.withPayload(event)
                 .setHeader("partitionKey", event.getKey())
                 .build();
-        streamBridge.send(bindingName, message);
+        try {
+            streamBridge.send(bindingName, message);
+        } catch (Exception ex) {
+            log.error("Send message to topic {} failed, because {}", bindingName, ex);
+        }
+     
     }
 
 }

@@ -28,7 +28,7 @@ public class UserDto  {
 
     private String image;
 
-    private Date registrationDate;
+    private LocalDate registrationDate;
 
     private Integer status;
 

@@ -69,7 +69,7 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
                 user.setEmail("dhjcbjhdc@dsd.com");
                 user.setFirstName("Test");
                 user.setLastName("Tester");
-                user.setRegistrationDate(new Date());
+                user.setRegistrationDate(LocalDate.now());
                 userBrokerClient.createUser(user).block();
                 return chain.filter(exchange);
             }

@@ -30,7 +30,7 @@ public class UserMessageProcessor {
     }
 
     @Bean
-    public Consumer<Event<String, UserDto>> messageProcessor() {
+    public Consumer<Event<String, UserDto>> userCrudMessageProcessor() {
         return event -> {
             LOG.info("Process message created at {}...", event.getEventCreatedAt());
 
