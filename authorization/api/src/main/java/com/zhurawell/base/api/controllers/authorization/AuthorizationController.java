@@ -35,7 +35,7 @@ public class AuthorizationController {
         this.jdbcScheduler = jdbcScheduler;
     }
 
-    @PostMapping("/login")     //TODO Add logout. Add token black list
+    @PostMapping("/login")
     public Mono<JwtResponseDto> login(@RequestBody UserLoginDto user) {
         return Mono
             .fromCallable(() ->

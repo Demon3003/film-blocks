@@ -9,7 +9,9 @@ public interface UserService {
 
     public User findById(BigInteger id);
 
-    public Mono<User> saveUserDetails(User user);
+    public User registerNewUser(User user);
+
+    public User saveUserDetails(User user);
 
     public User findByLogin(String login);
 

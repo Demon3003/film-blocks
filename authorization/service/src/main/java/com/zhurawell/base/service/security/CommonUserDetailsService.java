@@ -2,6 +2,8 @@ package com.zhurawell.base.service.security;
 
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.repo.user.UserRepository;
+import com.zhurawell.blocks.common.utils.exception.CustomExceptionHandler;
+import com.zhurawell.blocks.common.utils.exception.ErrorCodes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,7 +26,10 @@ public class CommonUserDetailsService implements UserDetailsService {
     @Transactional
     public UserDetails loadUserByUsername(String login) throws UsernameNotFoundException {
         User user = userRepository.findByEmailOrLogin(login, login).orElseThrow(() ->
-                new UsernameNotFoundException("User doesn't exists."));
+                CustomExceptionHandler.getInstance()
+                        .withErrorCode(ErrorCodes.C_101)
+                        .withParams(login)
+                        .build());
         return user.getUserDetails();
     }
 

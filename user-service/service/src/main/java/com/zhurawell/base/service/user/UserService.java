@@ -1,17 +1,21 @@
 package com.zhurawell.base.service.user;
 
+import com.zhurawell.base.data.model.user.Status;
 import com.zhurawell.base.data.model.user.User;
 import com.zhurawell.base.data.projection.user.UserLightView;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 
 public interface UserService {
 
     public Mono<User> findById(BigInteger id);
+
+    public Mono<User> createNewUser(User user);
 
     public Mono<User> saveUser(User user);
 

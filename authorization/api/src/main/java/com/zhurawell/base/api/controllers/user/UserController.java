@@ -1,7 +1,6 @@
 package com.zhurawell.base.api.controllers.user;
 
 import com.zhurawell.base.api.dto.user.UserDto;
-import com.zhurawell.base.api.integration.user.UserServiceIntegration;
 import com.zhurawell.base.api.mappers.UserMapper;
 import com.zhurawell.base.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -19,8 +18,6 @@ import java.math.BigInteger;
  * */
 @Slf4j
 @RestController
-@RequestMapping("/userDetails")
-//@PreAuthorize("hasAuthority('all:write') or hasAuthority('sysadm')")
 public class UserController {
 
     @Autowired
@@ -31,27 +28,24 @@ public class UserController {
 
     @Autowired
     private Scheduler jdbcScheduler;
-    
-    @Autowired
-    private UserServiceIntegration userIntegration;
-
 
     @PostMapping("/register")
     public Mono<UserDto> createUserAndUserDetail(@RequestBody UserDto user) {
         log.debug("User: {}", user);
-        return Mono.zip(
-                values -> (UserDto) values[1],
-                userService.saveUserDetails(userMapper.dtoToEntity(user)),
-                userIntegration.createBaseUser(user));
-//        return  userService.saveUserDetails(userMapper.dtoToEntity(user)).
-//                map(u -> userMapper.entityToDto(u));
+        return Mono.fromCallable(() ->
+                userService.registerNewUser(userMapper.dtoToEntity(user)))
+                .map(u -> userMapper.entityToDto(u))
+                .subscribeOn(jdbcScheduler);
+
     }
 
     @PutMapping("/update")
     public Mono<UserDto> updateUserDetails(@RequestBody UserDto user) {
         log.debug("User: {}", user);
-        return userService.saveUserDetails(userMapper.dtoToEntity(user)).
-                map(u -> userMapper.entityToDto(u));
+        return Mono.fromCallable(() ->
+                userService.saveUserDetails(userMapper.dtoToEntity(user))).
+                map(u -> userMapper.entityToDto(u))
+                .subscribeOn(jdbcScheduler);
     }
 
     @GetMapping("/get/{id}")

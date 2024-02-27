@@ -6,7 +6,7 @@ import com.zhurawell.base.api.constants.ServiceUrl;
 import com.zhurawell.base.api.dto.grants.Authorities;
 import com.zhurawell.base.api.dto.jwt.JwtResponseDto;
 import com.zhurawell.base.api.dto.user.UserDto;
-import com.zhurawell.base.api.intregration.broker.client.UserBrokerClient;
+import com.zhurawell.base.api.intregration.broker.client.user.UserBrokerClient;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +25,7 @@ import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Predicate;
 
@@ -40,9 +41,6 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Value("${jwt.header}")
-    private String AUTHORIZATION_HEADER;
 
     @Autowired
     private UserBrokerClient userBrokerClient;
@@ -62,23 +60,24 @@ public class AuthenticationPrefilter extends AbstractGatewayFilterFactory<Authen
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             log.info("URL is - " + request.getURI().getPath());
-            String token = request.getHeaders().getFirst(AUTHORIZATION_HEADER);
+            String token = request.getHeaders().getFirst("Authorization");
             log.info("Access token: "+ token);
             //TEST
             if(request.getURI().getPath().contains("createUser")) {
                 UserDto user = new UserDto();
+                user.setLogin("Coockie");
                 user.setEmail("dhjcbjhdc@dsd.com");
                 user.setFirstName("Test");
                 user.setLastName("Tester");
                 user.setRegistrationDate(LocalDate.now());
-                userBrokerClient.createUser(user);
+                userBrokerClient.createUser(user).block();
                 return chain.filter(exchange);
             }
             //TEST
             if(isSecured.test(request)) { // TODO remove isSecured, instead use FilterRegistrationBean
                 return webClient.get()
                         .uri(ServiceUrl.VALIDATE_TOKEN)
-                        .header(AUTHORIZATION_HEADER, token)
+                        .header("Authorization", token)
                         .retrieve().bodyToMono(JwtResponseDto.class)
                         .map(response -> {
                             exchange.getRequest().mutate().header(RestHeaders.LOGIN_HEADER, response.getLogin());

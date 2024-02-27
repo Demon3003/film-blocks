@@ -1,7 +1,9 @@
 package com.zhurawell.base.api.rest.controller.user;
 
+import com.zhurawell.base.api.rest.converters.UserRestConverter;
 import com.zhurawell.base.api.rest.dto.user.UserDto;
 import com.zhurawell.base.api.rest.mapper.UserMapper;
+import com.zhurawell.base.data.model.user.Status;
 import com.zhurawell.base.service.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +24,7 @@ import java.util.Date;
 @Slf4j
 @RestController
 @RequestMapping("/user")
-@PreAuthorize("hasAuthority('all:write') or hasAuthority('sysadm')")
+//@PreAuthorize("hasAuthority('all:write') or hasAuthority('sysadm')")
 public class UserController {
 
     @Autowired
@@ -32,10 +34,8 @@ public class UserController {
     public UserMapper userMapper;
 
     @PostMapping("/create")
-    public Mono<UserDto> createUser(@RequestBody UserDto user) {
-
-        user.setRegistrationDate(LocalDate.now());
-        return userService.saveUser(userMapper.dtoToEntity(user)).map(userMapper::entityToDto);
+    public Mono<UserDto> createNewUser(@RequestBody UserDto user) {
+        return userService.createNewUser(userMapper.dtoToEntity(user)).map(userMapper::entityToDto);
     }
 
     @PutMapping("/update")

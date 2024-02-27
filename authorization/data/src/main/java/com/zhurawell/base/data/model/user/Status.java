@@ -5,8 +5,9 @@ import java.util.Map;
 
 public enum Status {
 
-    ACTIVE("active", 1),
-    INACTIVE("inactive", 2);
+    NEW("new", 1),
+    ACTIVE("active", 2),
+    INACTIVE("inactive", 3);
 
     Status(String name, Integer id) {
         this.name = name;
@@ -18,8 +19,9 @@ public enum Status {
     private final Integer id;
 
     private static final Map<Integer, Status> ID_TO_STATUS =  Map.of(
-            1, ACTIVE,
-            2, INACTIVE
+            1, NEW,
+            2, ACTIVE,
+            3, INACTIVE
     );
 
     public String getStatusName() {

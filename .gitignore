@@ -13,7 +13,7 @@ target/
 .sts4-cache
 *.log
 *.gz
-config
+env
 
 
 ### IntelliJ IDEA ###
